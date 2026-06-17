@@ -9,64 +9,73 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
 
-   
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    }
   }, []);
 
- 
-  const isActive = (path) => path === pathname;
+  const isActive = (path) => {
+    if (path === "/") {
+      return pathname === path;
+    }
+    return pathname.startsWith(path);
+  };
 
-  
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     window.location.href = "/";
   };
 
-  
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Browse Ebooks", path: "/browse-ebooks" },
-  ];
-
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-
- 
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-indigo-600">Fable</span>
+          <Link
+            href="/"
+            className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition duration-300"
+          >
+            Fable
           </Link>
 
-   
           <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                href={link.path}
-                className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                  isActive(link.path) ? "text-indigo-600 font-semibold border-b-2 border-indigo-600" : ""
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            <Link
+              href="/"
+              className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
+                isActive("/")
+                  ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
+                  : ""
+              }`}
+            >
+              Home
+            </Link>
 
-      
+            <Link
+              href="/browse-ebooks"
+              className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
+                isActive("/browse-ebooks")
+                  ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
+                  : ""
+              }`}
+            >
+              Browse Ebooks
+            </Link>
+
             {isLoggedIn && (
               <Link
                 href="/dashboard"
                 className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                  isActive("/dashboard") ? "text-indigo-600 font-semibold border-b-2 border-indigo-600" : ""
+                  isActive("/dashboard")
+                    ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
+                    : ""
                 }`}
               >
                 Dashboard
               </Link>
             )}
- 
+
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
@@ -94,11 +103,11 @@ const Navbar = () => {
             )}
           </div>
 
-          
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 hover:text-indigo-600 focus:outline-none"
+              aria-label="Toggle menu"
             >
               <svg
                 className="w-6 h-6"
@@ -128,22 +137,30 @@ const Navbar = () => {
         </div>
       </div>
 
- 
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-4 py-3 space-y-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                href={link.path}
-                className={`block text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                  isActive(link.path) ? "text-indigo-600 font-semibold" : ""
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
+            <Link
+              href="/"
+              className={`block text-gray-700 hover:text-indigo-600 transition duration-300 ${
+                isActive("/") ? "text-indigo-600 font-semibold" : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+
+            <Link
+              href="/browse-ebooks"
+              className={`block text-gray-700 hover:text-indigo-600 transition duration-300 ${
+                isActive("/browse-ebooks")
+                  ? "text-indigo-600 font-semibold"
+                  : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Browse Ebooks
+            </Link>
 
             {isLoggedIn && (
               <Link

@@ -1,62 +1,45 @@
-import Link from "next/link";
-import {
-  FaFacebook,
-  FaTwitter,
-  FaInstagram,
-  FaLinkedin,
-  FaYoutube,
-} from "react-icons/fa";
+ 
+ import Link from "next/link";
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
         {/* ===== গ্রিড লেআউট ===== */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {/* ===== কোম্পানি সম্পর্কে ===== */}
           <div>
             <h3 className="text-2xl font-bold text-white mb-4">Fable</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Discover & Read Original Ebooks. Connect with talented writers and
+              Discover & Read Original Ebooks. Connect with talented writers and 
               explore a world of stories.
             </p>
           </div>
 
           {/* ===== দ্রুত লিংক ===== */}
           <div>
-            <h4 className="text-white font-semibold text-lg mb-4">
-              Quick Links
-            </h4>
+            <h4 className="text-white font-semibold text-lg mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link
-                  href="/about"
-                  className="text-gray-400 hover:text-indigo-400 transition duration-300"
-                >
+                <Link href="/about" className="text-gray-400 hover:text-indigo-400 transition duration-300">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/contact"
-                  className="text-gray-400 hover:text-indigo-400 transition duration-300"
-                >
+                <Link href="/contact" className="text-gray-400 hover:text-indigo-400 transition duration-300">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/privacy"
-                  className="text-gray-400 hover:text-indigo-400 transition duration-300"
-                >
+                <Link href="/privacy" className="text-gray-400 hover:text-indigo-400 transition duration-300">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/terms"
-                  className="text-gray-400 hover:text-indigo-400 transition duration-300"
-                >
+                <Link href="/terms" className="text-gray-400 hover:text-indigo-400 transition duration-300">
                   Terms of Service
                 </Link>
               </li>
@@ -107,9 +90,7 @@ const Footer = () => {
 
           {/* ===== নিউজলেটার ===== */}
           <div>
-            <h4 className="text-white font-semibold text-lg mb-4">
-              Newsletter
-            </h4>
+            <h4 className="text-white font-semibold text-lg mb-4">Newsletter</h4>
             <p className="text-gray-400 text-sm mb-3">
               Subscribe to get updates on new ebooks and offers.
             </p>
@@ -133,8 +114,8 @@ const Footer = () => {
         {/* ===== কপিরাইট ===== */}
         <div className="border-t border-gray-800 mt-10 pt-6 text-center text-sm text-gray-500">
           <p>
-            &copy; {new Date().getFullYear()}{" "}
-            <span className="text-indigo-400">Fable</span>. All rights reserved.
+            &copy; {new Date().getFullYear()} <span className="text-indigo-400">Fable</span>. 
+            All rights reserved.
           </p>
         </div>
       </div>
