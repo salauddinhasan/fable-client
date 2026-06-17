@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -138,7 +139,7 @@ const RegisterForm = () => {
           onClick={handleGoogleLogin}
           className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition"
         >
-          <FaGoogle className="text-red-500" /> Sign up with Google
+        <FcGoogle size={25} /> Sign up with Google
         </button>
 
         <p className="text-center text-sm text-gray-600">
