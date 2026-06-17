@@ -9,23 +9,23 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
 
-  // লোকাল স্টোরেজ চেক করুন (শুধু ক্লায়েন্ট সাইডে)
+   
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
 
-  // লিংক অ্যাক্টিভ কিনা চেক করুন
+ 
   const isActive = (path) => path === pathname;
 
-  // লগআউট ফাংশন
+  
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     window.location.href = "/";
   };
 
-  // নেভিগেশন লিংক
+  
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Browse Ebooks", path: "/browse-ebooks" },
@@ -36,12 +36,12 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
-          {/* ===== লোগো ===== */}
+ 
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-indigo-600">Fable</span>
           </Link>
 
-          {/* ===== ডেস্কটপ মেনু ===== */}
+   
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -55,7 +55,7 @@ const Navbar = () => {
               </Link>
             ))}
 
-            {/* লগিন থাকলে ড্যাশবোর্ড দেখাবে */}
+      
             {isLoggedIn && (
               <Link
                 href="/dashboard"
@@ -66,8 +66,7 @@ const Navbar = () => {
                 Dashboard
               </Link>
             )}
-
-            {/* লগিন/লগআউট */}
+ 
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
@@ -95,7 +94,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* ===== হ্যামবার্গার বাটন (মোবাইল) ===== */}
+          
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -129,7 +128,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* =====   (Dropdown) ===== */}
+ 
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-4 py-3 space-y-3">
