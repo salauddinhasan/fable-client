@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
+ 
+import { authClient } from "../../../lib/auth-client.js";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -24,28 +26,29 @@ const LoginForm = () => {
     setLoading(true);
     setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+    
+    const { data, error: authError } = await authClient.signIn.email({
+      email: formData.email,
+      password: formData.password,
+    });
 
-      const data = await response.json();
+    setLoading(false);
 
-      if (!response.ok) throw new Error(data.message || "Login failed");
-
-      localStorage.setItem("token", data.token);
+    if (authError) {
+      
+      setError(authError.message || "Invalid email or password");
+    } else {
+       
       router.push("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+  const handleGoogleLogin = async () => {
+     
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",  
+    });
   };
 
   return (
@@ -93,7 +96,7 @@ const LoginForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition disabled:opacity-50"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -107,13 +110,14 @@ const LoginForm = () => {
 
         <button
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition"
+          type="button"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition cursor-pointer"
         >
           <FcGoogle size={22} /> Sign in with Google
         </button>
 
         <p className="text-center text-sm text-gray-600">
-          Don&apo;t have an account?{" "}
+          Don&atops;t have an account?{" "}
           <Link href="/register" className="text-indigo-600 hover:text-indigo-700 font-semibold">
             Sign up
           </Link>

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaGoogle } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { authClient } from "../../../lib/auth-client.js";
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -27,37 +27,38 @@ const RegisterForm = () => {
     setLoading(true);
     setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+   
+const { data, error: authError } = await authClient.signUp.email({
+  email: formData.email,
+  password: formData.password,
+  name: formData.name,
+  role: formData.role,  
+});
 
-      const data = await response.json();
+    setLoading(false);
 
-      if (!response.ok) throw new Error(data.message || "Registration failed");
-
-      localStorage.setItem("token", data.token);
+    if (authError) {
+      setError(authError.message || "Registration failed");
+    } else {
       router.push("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+  const handleGoogleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
   };
 
   return (
     <div className="w-full flex items-center justify-center bg-gray-50 py-12 px-4">
       <div className="max-w-md w-full space-y-6 bg-white p-8 rounded-2xl shadow-md">
-        
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-          <p className="mt-2 text-sm text-gray-600">Join Fable and start reading amazing ebooks</p>
+          <p className="mt-2 text-sm text-gray-600">
+            Join Fable and start reading amazing ebooks
+          </p>
         </div>
 
         {error && (
@@ -123,7 +124,7 @@ const RegisterForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition disabled:opacity-50"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
@@ -137,9 +138,10 @@ const RegisterForm = () => {
 
         <button
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition"
+          type="button"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition cursor-pointer"
         >
-        <FcGoogle size={25} /> Sign up with Google
+          <FcGoogle size={25} /> Sign up with Google
         </button>
 
         <p className="text-center text-sm text-gray-600">

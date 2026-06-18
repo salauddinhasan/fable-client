@@ -1,20 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { authClient } from "../lib/auth-client.js";
+ 
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    }
-  }, []);
+  // 🎯 Better Auth-এর নিজস্ব হুক দিয়ে সেশন এবং লগইন স্ট্যাটাস রিড করা
+  const { data: session, isPending } = authClient.useSession();
+  const isLoggedIn = !!session;
 
   const isActive = (path) => {
     if (path === "/") {
@@ -23,10 +22,16 @@ const Navbar = () => {
     return pathname.startsWith(path);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    window.location.href = "/";
+  // 🎯 Better Auth অফিশিয়াল লগআউট মেথড
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login"); // লগআউট সফল হলে লগইন পেজে পাঠাবে
+          router.refresh();
+        },
+      },
+    });
   };
 
   return (
@@ -40,68 +45,72 @@ const Navbar = () => {
             Fable
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/"
-              className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                isActive("/")
-                  ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
-                  : ""
-              }`}
-            >
-              Home
-            </Link>
-
-            <Link
-              href="/browse-ebooks"
-              className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                isActive("/browse-ebooks")
-                  ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
-                  : ""
-              }`}
-            >
-              Browse Ebooks
-            </Link>
-
-            {isLoggedIn && (
+          {/* ডেটা লোড হওয়ার সময় বাটন কাঁপাকাঁপি বন্ধ করতে জাস্ট চেকিং */}
+          {!isPending && (
+            <div className="hidden md:flex items-center space-x-8">
               <Link
-                href="/dashboard"
+                href="/"
                 className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                  isActive("/dashboard")
+                  isActive("/")
                     ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
                     : ""
                 }`}
               >
-                Dashboard
+                Home
               </Link>
-            )}
 
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-300"
+              <Link
+                href="/browse-ebooks"
+                className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
+                  isActive("/browse-ebooks")
+                    ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
+                    : ""
+                }`}
               >
-                Logout
-              </button>
-            ) : (
-              <div className="flex items-center space-x-4">
+                Browse Ebooks
+              </Link>
+
+              {/* 🎯 লগইন থাকলে ড্যাশবোর্ড দেখাবে */}
+              {isLoggedIn && (
                 <Link
-                  href="/login"
+                  href="/dashboard"
                   className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                    isActive("/login") ? "text-indigo-600 font-semibold" : ""
+                    isActive("/dashboard")
+                      ? "text-indigo-600 font-semibold border-b-2 border-indigo-600"
+                      : ""
                   }`}
                 >
-                  Login
+                  Dashboard
                 </Link>
-                <Link
-                  href="/register"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-300"
+              )}
+
+              {isLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-300 cursor-pointer"
                 >
-                  Register
-                </Link>
-              </div>
-            )}
-          </div>
+                  Logout
+                </button>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <Link
+                    href="/login"
+                    className={`text-gray-700 hover:text-indigo-600 transition duration-300 ${
+                      isActive("/login") ? "text-indigo-600 font-semibold" : ""
+                    }`}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-300"
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="md:hidden">
             <button
@@ -117,19 +126,9 @@ const Navbar = () => {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {isMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
@@ -137,7 +136,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      {isMenuOpen && (
+      {/* মোবাইল মেনু */}
+      {isMenuOpen && !isPending && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-4 py-3 space-y-3">
             <Link
@@ -153,9 +153,7 @@ const Navbar = () => {
             <Link
               href="/browse-ebooks"
               className={`block text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                isActive("/browse-ebooks")
-                  ? "text-indigo-600 font-semibold"
-                  : ""
+                isActive("/browse-ebooks") ? "text-indigo-600 font-semibold" : ""
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -180,7 +178,7 @@ const Navbar = () => {
                   handleLogout();
                   setIsMenuOpen(false);
                 }}
-                className="w-full text-left text-red-500 hover:text-red-600 transition duration-300"
+                className="w-full text-left text-red-500 hover:text-red-600 transition duration-300 cursor-pointer"
               >
                 Logout
               </button>
