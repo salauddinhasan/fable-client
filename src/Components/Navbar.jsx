@@ -4,14 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "../lib/auth-client.js";
- 
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
-  // 🎯 Better Auth-এর নিজস্ব হুক দিয়ে সেশন এবং লগইন স্ট্যাটাস রিড করা
   const { data: session, isPending } = authClient.useSession();
   const isLoggedIn = !!session;
 
@@ -22,12 +20,11 @@ const Navbar = () => {
     return pathname.startsWith(path);
   };
 
-  // 🎯 Better Auth অফিশিয়াল লগআউট মেথড
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/login"); // লগআউট সফল হলে লগইন পেজে পাঠাবে
+          router.push("/login");
           router.refresh();
         },
       },
@@ -45,7 +42,6 @@ const Navbar = () => {
             Fable
           </Link>
 
-          {/* ডেটা লোড হওয়ার সময় বাটন কাঁপাকাঁপি বন্ধ করতে জাস্ট চেকিং */}
           {!isPending && (
             <div className="hidden md:flex items-center space-x-8">
               <Link
@@ -70,7 +66,6 @@ const Navbar = () => {
                 Browse Ebooks
               </Link>
 
-              {/* 🎯 লগইন থাকলে ড্যাশবোর্ড দেখাবে */}
               {isLoggedIn && (
                 <Link
                   href="/dashboard"
@@ -126,9 +121,19 @@ const Navbar = () => {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -136,7 +141,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* মোবাইল মেনু */}
       {isMenuOpen && !isPending && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-4 py-3 space-y-3">
@@ -153,7 +157,9 @@ const Navbar = () => {
             <Link
               href="/browse-ebooks"
               className={`block text-gray-700 hover:text-indigo-600 transition duration-300 ${
-                isActive("/browse-ebooks") ? "text-indigo-600 font-semibold" : ""
+                isActive("/browse-ebooks")
+                  ? "text-indigo-600 font-semibold"
+                  : ""
               }`}
               onClick={() => setIsMenuOpen(false)}
             >

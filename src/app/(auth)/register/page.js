@@ -27,13 +27,12 @@ const RegisterForm = () => {
     setLoading(true);
     setError("");
 
-   
-const { data, error: authError } = await authClient.signUp.email({
-  email: formData.email,
-  password: formData.password,
-  name: formData.name,
-  role: formData.role,  
-});
+    const { data, error: authError } = await authClient.signUp.email({
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+      role: formData.role,
+    });
 
     setLoading(false);
 
@@ -69,7 +68,9 @@ const { data, error: authError } = await authClient.signUp.email({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               name="name"
@@ -82,7 +83,9 @@ const { data, error: authError } = await authClient.signUp.email({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
@@ -95,7 +98,9 @@ const { data, error: authError } = await authClient.signUp.email({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -109,7 +114,9 @@ const { data, error: authError } = await authClient.signUp.email({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">I want to join as</label>
+            <label className="block text-sm font-medium text-gray-700">
+              I want to join as
+            </label>
             <select
               name="role"
               value={formData.role}
@@ -146,7 +153,10 @@ const { data, error: authError } = await authClient.signUp.email({
 
         <p className="text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+          <Link
+            href="/login"
+            className="text-indigo-600 hover:text-indigo-700 font-semibold"
+          >
             Sign in
           </Link>
         </p>
