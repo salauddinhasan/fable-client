@@ -11,10 +11,10 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Better Auth সেশন রিড করা
+  
   const { data: session, isPending } = authClient.useSession();
   const isLoggedIn = !!session;
-  const userRole = session?.user?.role || "user"; // ডিফল্ট রোল 'user'
+  const userRole = session?.user?.role || "user"; 
 
   const isActive = (path) => {
     if (path === "/") {
@@ -23,7 +23,7 @@ const Navbar = () => {
     return pathname.startsWith(path);
   };
 
-  // Better Auth লগআউট মেথড
+  
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
@@ -35,7 +35,7 @@ const Navbar = () => {
     });
   };
 
-  // রোল অনুযায়ী সঠিক ড্যাশবোর্ড পাথ ঠিক করা
+ 
   const getDashboardLink = () => {
     if (userRole === "admin") return "/dashboard/admin";
     if (userRole === "writer") return "/dashboard/writer";
