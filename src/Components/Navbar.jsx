@@ -36,7 +36,6 @@ const Navbar = () => {
     return "/dashboard/user";
   };
 
-  // ইউজার নামের প্রথম অংশ
   const firstName = session?.user?.name?.split(" ")[0] || "User";
 
   return (
@@ -48,7 +47,7 @@ const Navbar = () => {
             href="/"
             className="text-2xl font-bold text-indigo-600 hover:text-indigo-700"
           >
-             Fable
+            Fable
           </Link>
 
           {/* Desktop Menu */}
