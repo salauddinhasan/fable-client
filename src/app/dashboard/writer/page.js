@@ -1,53 +1,115 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { PenTool, DollarSign, BookOpen, TrendingUp } from "lucide-react";
+import { PenTool, DollarSign, BookOpen, TrendingUp, X } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 export default function WriterDashboard() {
+  const { data: session } = authClient.useSession();
+  const [ebooks, setEbooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editModal, setEditModal] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    price: "",
+    genre: "Fiction",
+    status: "published",
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch(
+        `http://localhost:5000/api/dashboard/writer/ebooks?writerEmail=${session.user.email}`,
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setEbooks(Array.isArray(data) ? data : []);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }
+  }, [session]);
+
+  const openEdit = (ebook) => {
+    setEditModal(ebook._id);
+    setEditForm({
+      title: ebook.title,
+      description: ebook.description,
+      price: ebook.price,
+      genre: ebook.genre,
+      status: ebook.status,
+    });
+  };
+
+  const handleEditChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdate = async () => {
+    setSaving(true);
+    await fetch(`http://localhost:5000/api/ebooks/${editModal}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editForm),
+    });
+    setEbooks(
+      ebooks.map((e) => (e._id === editModal ? { ...e, ...editForm } : e)),
+    );
+    setEditModal(null);
+    setSaving(false);
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this ebook?")) {
+      await fetch(`http://localhost:5000/api/ebooks/${id}`, {
+        method: "DELETE",
+      });
+      setEbooks(ebooks.filter((e) => e._id !== id));
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+      </div>
+    );
+  }
+
+  const published = ebooks.filter((e) => e.status === "published").length;
+  const totalSales = ebooks.reduce((sum, e) => sum + (e.salesCount || 0), 0);
+  const totalRevenue = ebooks
+    .filter((e) => e.sold)
+    .reduce((sum, e) => sum + e.price, 0);
+
   const stats = [
     {
       label: "Total Ebooks",
-      value: "8",
+      value: ebooks.length,
       icon: PenTool,
       color: "bg-indigo-500",
     },
-    { label: "Published", value: "5", icon: BookOpen, color: "bg-green-500" },
+    {
+      label: "Published",
+      value: published,
+      icon: BookOpen,
+      color: "bg-green-500",
+    },
     {
       label: "Total Sales",
-      value: "230",
+      value: totalSales,
       icon: DollarSign,
       color: "bg-yellow-500",
     },
     {
       label: "Revenue",
-      value: "$1,234",
+      value: `$${totalRevenue.toFixed(2)}`,
       icon: TrendingUp,
       color: "bg-purple-500",
-    },
-  ];
-
-  const myEbooks = [
-    {
-      title: "The Midnight Garden",
-      status: "Published",
-      price: "$9.99",
-      sales: 120,
-      date: "2024-03-15",
-    },
-    {
-      title: "Garden Secrets",
-      status: "Draft",
-      price: "$14.99",
-      sales: 0,
-      date: "2024-03-10",
-    },
-    {
-      title: "Night Blooms",
-      status: "Published",
-      price: "$7.99",
-      sales: 85,
-      date: "2024-02-28",
     },
   ];
 
@@ -106,46 +168,157 @@ export default function WriterDashboard() {
               </tr>
             </thead>
             <tbody>
-              {myEbooks.map((ebook, i) => (
-                <tr
-                  key={i}
-                  className="border-t border-gray-50 hover:bg-gray-50"
-                >
-                  <td className="p-3 font-medium text-gray-900">
-                    {ebook.title}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        ebook.status === "Published"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-yellow-50 text-yellow-700"
-                      }`}
-                    >
-                      {ebook.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-indigo-600 font-semibold">
-                    {ebook.price}
-                  </td>
-                  <td className="p-3">{ebook.sales}</td>
-                  <td className="p-3 text-gray-500">{ebook.date}</td>
-                  <td className="p-3">
-                    <div className="flex gap-2">
-                      <button className="text-xs text-indigo-600 hover:underline">
-                        Edit
-                      </button>
-                      <button className="text-xs text-red-500 hover:underline">
-                        Delete
-                      </button>
-                    </div>
+              {ebooks.length > 0 ? (
+                ebooks.map((ebook, i) => (
+                  <tr
+                    key={i}
+                    className="border-t border-gray-50 hover:bg-gray-50"
+                  >
+                    <td className="p-3 font-medium text-gray-900">
+                      {ebook.title}
+                    </td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          ebook.status === "published"
+                            ? "bg-green-50 text-green-700"
+                            : "bg-yellow-50 text-yellow-700"
+                        }`}
+                      >
+                        {ebook.status}
+                      </span>
+                    </td>
+                    <td className="p-3 text-indigo-600 font-semibold">
+                      ${ebook.price}
+                    </td>
+                    <td className="p-3">{ebook.salesCount || 0}</td>
+                    <td className="p-3 text-gray-500">
+                      {new Date(ebook.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="p-3">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEdit(ebook)}
+                          className="text-xs text-indigo-600 hover:underline cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(ebook._id)}
+                          className="text-xs text-red-500 hover:underline cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="p-6 text-center text-gray-400">
+                    No ebooks yet. Click &quot;+ Add New Ebook&quot; to publish
+                    your first ebook!
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Edit Ebook</h2>
+              <button
+                onClick={() => setEditModal(null)}
+                className="cursor-pointer"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold">Title</label>
+                <input
+                  name="title"
+                  className="input input-bordered w-full"
+                  value={editForm.title}
+                  onChange={handleEditChange}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">Description</label>
+                <textarea
+                  name="description"
+                  className="textarea textarea-bordered w-full h-24"
+                  value={editForm.description}
+                  onChange={handleEditChange}
+                ></textarea>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold">Price</label>
+                  <input
+                    type="number"
+                    name="price"
+                    className="input input-bordered w-full"
+                    value={editForm.price}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold">Genre</label>
+                  <select
+                    name="genre"
+                    className="select select-bordered w-full"
+                    value={editForm.genre}
+                    onChange={handleEditChange}
+                  >
+                    <option>Fiction</option>
+                    <option>Mystery</option>
+                    <option>Romance</option>
+                    <option>Sci-Fi</option>
+                    <option>Fantasy</option>
+                    <option>Horror</option>
+                    <option>Thriller</option>
+                    <option>Poetry</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold">Status</label>
+                <select
+                  name="status"
+                  className="select select-bordered w-full"
+                  value={editForm.status}
+                  onChange={handleEditChange}
+                >
+                  <option value="published">Published</option>
+                  <option value="unpublished">Unpublished</option>
+                </select>
+              </div>
+              <button
+                onClick={handleUpdate}
+                disabled={saving}
+                className="btn btn-primary w-full"
+              >
+                {saving ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  "Update Ebook"
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

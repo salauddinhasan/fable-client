@@ -3,9 +3,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import { ArrowLeft, Upload, Save } from "lucide-react";
 
 export default function AddEbookPage() {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -13,19 +18,46 @@ export default function AddEbookPage() {
     genre: "Fiction",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // পরে API call হবে
-    setTimeout(() => {
-      alert("Ebook added successfully! (Demo)");
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/ebooks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          price: Number(form.price),
+          genre: form.genre,
+          writerName:
+            session?.user?.name || session?.user?.email || "Unknown Writer",
+          writerEmail: session?.user?.email || "",
+          writer: session?.user?.id || null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data._id) {
+        alert("Ebook published successfully!");
+        router.push("/dashboard/writer");
+      } else {
+        setError(data.error || "Failed to publish ebook");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -39,6 +71,12 @@ export default function AddEbookPage() {
       </Link>
 
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Add New Ebook</h1>
+
+      {error && (
+        <div className="alert alert-error mb-4">
+          <span>{error}</span>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -142,7 +180,7 @@ export default function AddEbookPage() {
             ) : (
               <Save className="w-5 h-5" />
             )}
-            {loading ? "Saving..." : "Publish Ebook"}
+            {loading ? "Publishing..." : "Publish Ebook"}
           </button>
         </form>
       </motion.div>

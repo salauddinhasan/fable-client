@@ -1,64 +1,77 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Users, BookOpen, DollarSign, TrendingUp } from "lucide-react";
 
 export default function AdminDashboard() {
-  const stats = [
+  const [stats, setStats] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsRes, txnRes, usersRes] = await Promise.all([
+          fetch("http://localhost:5000/api/dashboard/stats"),
+          fetch("http://localhost:5000/api/dashboard/transactions"),
+          fetch("http://localhost:5000/api/dashboard/users"),
+        ]);
+        const statsData = await statsRes.json();
+        const txnData = await txnRes.json();
+        const usersData = await usersRes.json();
+
+        setStats(statsData);
+        setTransactions(Array.isArray(txnData) ? txnData : []);
+        setUsers(Array.isArray(usersData) ? usersData : []);
+      } catch (err) {
+        console.error("Dashboard Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+      </div>
+    );
+  }
+
+  const totalWriters = users.filter((u) => u.role === "writer").length;
+
+  const statCards = [
     {
       label: "Total Users",
-      value: "1,234",
+      value: users.length,
       icon: Users,
       color: "bg-blue-500",
-      change: "+12%",
+      change: "",
     },
     {
       label: "Total Writers",
-      value: "456",
+      value: totalWriters,
       icon: Users,
       color: "bg-indigo-500",
-      change: "+8%",
+      change: "",
     },
     {
       label: "Ebooks Sold",
-      value: "5,678",
+      value: stats?.totalSold || 0,
       icon: BookOpen,
       color: "bg-green-500",
-      change: "+23%",
+      change: "",
     },
     {
       label: "Total Revenue",
-      value: "$45,678",
+      value: `$${stats?.totalRevenue || 0}`,
       icon: DollarSign,
       color: "bg-purple-500",
-      change: "+18%",
-    },
-  ];
-
-  const recentTransactions = [
-    {
-      id: "TXN-001",
-      user: "john@email.com",
-      type: "Purchase",
-      ebook: "The Midnight Garden",
-      amount: "$9.99",
-      date: "2024-03-20",
-    },
-    {
-      id: "TXN-002",
-      user: "writer@email.com",
-      type: "Publishing Fee",
-      ebook: "-",
-      amount: "$29.99",
-      date: "2024-03-19",
-    },
-    {
-      id: "TXN-003",
-      user: "jane@email.com",
-      type: "Purchase",
-      ebook: "Stars Beyond",
-      amount: "$12.99",
-      date: "2024-03-18",
+      change: "",
     },
   ];
 
@@ -68,7 +81,7 @@ export default function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, i) => (
+        {statCards.map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
@@ -87,16 +100,13 @@ export default function AdminDashboard() {
                 <p className="text-xl font-bold">{stat.value}</p>
               </div>
             </div>
-            <p className="text-xs text-green-500 mt-2">
-              {stat.change} from last month
-            </p>
           </motion.div>
         ))}
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Sales Chart Placeholder */}
+        {/* Sales Chart */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
           <h3 className="font-semibold text-gray-900 mb-4">Monthly Sales</h3>
           <div className="flex items-end gap-2 h-40">
@@ -129,7 +139,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Genre Chart Placeholder */}
+        {/* Genre Chart */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
           <h3 className="font-semibold text-gray-900 mb-4">Ebooks by Genre</h3>
           <div className="space-y-3">
@@ -177,33 +187,45 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {recentTransactions.map((txn, i) => (
-                <tr
-                  key={i}
-                  className="border-t border-gray-50 hover:bg-gray-50"
-                >
-                  <td className="p-3 font-mono text-xs text-gray-500">
-                    {txn.id}
+              {transactions.length > 0 ? (
+                transactions.map((txn, i) => (
+                  <tr
+                    key={i}
+                    className="border-t border-gray-50 hover:bg-gray-50"
+                  >
+                    <td className="p-3 font-mono text-xs text-gray-500">
+                      {txn.transactionId?.slice(-8) || "N/A"}
+                    </td>
+                    <td className="p-3 text-gray-700">{txn.userEmail}</td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          txn.type === "purchase"
+                            ? "bg-green-50 text-green-700"
+                            : "bg-blue-50 text-blue-700"
+                        }`}
+                      >
+                        {txn.type}
+                      </span>
+                    </td>
+                    <td className="p-3 text-gray-700">
+                      {txn.ebookTitle || "-"}
+                    </td>
+                    <td className="p-3 font-semibold text-indigo-600">
+                      ${txn.amount}
+                    </td>
+                    <td className="p-3 text-gray-500">
+                      {new Date(txn.createdAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="p-6 text-center text-gray-400">
+                    No transactions yet
                   </td>
-                  <td className="p-3 text-gray-700">{txn.user}</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        txn.type === "Purchase"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-blue-50 text-blue-700"
-                      }`}
-                    >
-                      {txn.type}
-                    </span>
-                  </td>
-                  <td className="p-3 text-gray-700">{txn.ebook}</td>
-                  <td className="p-3 font-semibold text-indigo-600">
-                    {txn.amount}
-                  </td>
-                  <td className="p-3 text-gray-500">{txn.date}</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

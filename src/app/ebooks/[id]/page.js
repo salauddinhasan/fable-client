@@ -14,63 +14,7 @@ import {
   User,
   ArrowLeft,
   ShoppingCart,
-  Eye,
 } from "lucide-react";
-
-// ডামি ডাটা (পরে API থেকে আসবে)
-const dummyEbooks = [
-  {
-    id: 1,
-    title: "The Midnight Garden",
-    writer: "Sarah Johnson",
-    writerId: 101,
-    price: 9.99,
-    genre: "Fiction",
-    description:
-      "A hauntingly beautiful tale set in a mysterious garden that only blooms at midnight. When Clara discovers the secret behind the garden's enchanting flowers, she embarks on a journey that will change her life forever. This bestselling novel weaves together themes of love, loss, and the magic that exists in the world around us.",
-    cover: "📗",
-    rating: 4.8,
-    readers: 2340,
-    status: "Available",
-    uploadedDate: "2024-03-15",
-    pages: 320,
-    language: "English",
-  },
-  {
-    id: 2,
-    title: "Stars Beyond",
-    writer: "Mike Chen",
-    writerId: 102,
-    price: 12.99,
-    genre: "Sci-Fi",
-    description:
-      "In a distant future where humanity has colonized the stars, one pilot discovers an ancient alien artifact that could change the course of history. A thrilling space adventure that explores the boundaries of human knowledge and the price of discovery.",
-    cover: "📘",
-    rating: 4.6,
-    readers: 1890,
-    status: "Sold",
-    uploadedDate: "2024-02-20",
-    pages: 450,
-    language: "English",
-  },
-  {
-    id: 3,
-    title: "Love in Paris",
-    writer: "Emma Davis",
-    writerId: 103,
-    price: 7.99,
-    genre: "Romance",
-    description:
-      "A chance encounter in the City of Love leads to an unforgettable romance. Follow Sophie and Jean as they navigate the streets of Paris, discovering that true love often finds us when we least expect it.",
-    cover: "📙",
-    rating: 4.9,
-    readers: 3200,
-    status: "Available",
-    uploadedDate: "2024-04-01",
-    pages: 280,
-    language: "English",
-  },
-];
 
 export default function EbookDetailsPage() {
   const { id } = useParams();
@@ -80,18 +24,25 @@ export default function EbookDetailsPage() {
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   useEffect(() => {
-    // সিমুলেট API call (পরে real API হবে)
     setLoading(true);
-    setTimeout(() => {
-      const found = dummyEbooks.find((e) => e.id === Number(id));
-      setEbook(found || null);
-      setLoading(false);
-    }, 800);
+    fetch(`http://localhost:5000/api/ebooks/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data._id) {
+          setEbook(data);
+        } else {
+          setEbook(null);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setEbook(null);
+        setLoading(false);
+      });
   }, [id]);
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
-    // পরে Stripe Checkout redirect হবে
     setTimeout(() => {
       alert("Redirecting to Stripe Checkout...");
       setIsPurchasing(false);
@@ -151,6 +102,12 @@ export default function EbookDetailsPage() {
     );
   }
 
+  const uploadDate = new Date(ebook.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Back Navigation */}
@@ -181,8 +138,16 @@ export default function EbookDetailsPage() {
                 className="w-full md:w-64 flex-shrink-0"
               >
                 <div className="relative bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl p-8 flex items-center justify-center shadow-lg">
-                  <span className="text-8xl">{ebook.cover}</span>
-                  {ebook.status === "Sold" && (
+                  {ebook.coverImage ? (
+                    <img
+                      src={ebook.coverImage}
+                      alt={ebook.title}
+                      className="w-full h-72 object-cover rounded-lg"
+                    />
+                  ) : (
+                    <span className="text-8xl">📖</span>
+                  )}
+                  {ebook.sold && (
                     <div className="absolute top-3 right-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
                       Sold
                     </div>
@@ -192,11 +157,16 @@ export default function EbookDetailsPage() {
 
               {/* Details */}
               <div className="flex-1 space-y-5">
-                {/* Title & Status */}
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">
-                      {ebook.status}
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-full border ${
+                        ebook.sold
+                          ? "bg-red-50 text-red-700 border-red-200"
+                          : "bg-green-50 text-green-700 border-green-200"
+                      }`}
+                    >
+                      {ebook.sold ? "Sold" : "Available"}
                     </span>
                     <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-full border border-indigo-200">
                       {ebook.genre}
@@ -208,34 +178,9 @@ export default function EbookDetailsPage() {
                 </div>
 
                 {/* Writer */}
-                <Link
-                  href={`/writer/${ebook.writerId}`}
-                  className="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition"
-                >
+                <div className="inline-flex items-center gap-2 text-gray-600">
                   <User className="w-4 h-4" />
-                  <span className="font-medium">{ebook.writer}</span>
-                </Link>
-
-                {/* Rating */}
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(ebook.rating)
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="font-semibold text-gray-700">
-                    {ebook.rating}
-                  </span>
-                  <span className="text-gray-400 text-sm">
-                    ({ebook.readers.toLocaleString()} readers)
-                  </span>
+                  <span className="font-medium">{ebook.writerName}</span>
                 </div>
 
                 {/* Description */}
@@ -252,15 +197,11 @@ export default function EbookDetailsPage() {
                 <div className="flex flex-wrap gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span>Uploaded: {ebook.uploadedDate}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <BookOpen className="w-4 h-4" />
-                    <span>{ebook.pages} pages</span>
+                    <span>Uploaded: {uploadDate}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Tag className="w-4 h-4" />
-                    <span>{ebook.language}</span>
+                    <span>{ebook.genre}</span>
                   </div>
                 </div>
 
@@ -274,12 +215,11 @@ export default function EbookDetailsPage() {
                   </div>
 
                   <div className="flex gap-3 w-full sm:w-auto">
-                    {/* Purchase Button */}
-                    {ebook.status !== "Sold" ? (
+                    {!ebook.sold ? (
                       <button
                         onClick={handlePurchase}
                         disabled={isPurchasing}
-                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300 disabled:opacity-50"
+                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg disabled:opacity-50"
                       >
                         {isPurchasing ? (
                           <>
@@ -302,13 +242,12 @@ export default function EbookDetailsPage() {
                       </button>
                     )}
 
-                    {/* Bookmark Button */}
                     <button
                       onClick={handleBookmark}
                       className={`p-3 rounded-xl border-2 transition-all ${
                         isBookmarked
                           ? "border-indigo-600 bg-indigo-50 text-indigo-600"
-                          : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300 hover:text-indigo-500"
+                          : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300"
                       }`}
                     >
                       {isBookmarked ? (

@@ -1,72 +1,38 @@
 "use client";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Star, Eye } from "lucide-react";
-
-const ebooks = [
-  {
-    id: 1,
-    title: "The Midnight Garden",
-    writer: "Sarah Johnson",
-    price: 9.99,
-    rating: 4.8,
-    readers: 2340,
-    cover: "📗",
-    genre: "Fiction",
-  },
-  {
-    id: 2,
-    title: "Stars Beyond",
-    writer: "Mike Chen",
-    price: 12.99,
-    rating: 4.6,
-    readers: 1890,
-    cover: "📘",
-    genre: "Sci-Fi",
-  },
-  {
-    id: 3,
-    title: "Love in Paris",
-    writer: "Emma Davis",
-    price: 7.99,
-    rating: 4.9,
-    readers: 3200,
-    cover: "📙",
-    genre: "Romance",
-  },
-  {
-    id: 4,
-    title: "The Dark Manor",
-    writer: "John Black",
-    price: 8.99,
-    rating: 4.5,
-    readers: 1560,
-    cover: "📕",
-    genre: "Horror",
-  },
-  {
-    id: 5,
-    title: "Dragon's Quest",
-    writer: "Lisa Wong",
-    price: 11.99,
-    rating: 4.7,
-    readers: 2100,
-    cover: "📔",
-    genre: "Fantasy",
-  },
-  {
-    id: 6,
-    title: "Code Zero",
-    writer: "Alex Kim",
-    price: 10.99,
-    rating: 4.4,
-    readers: 980,
-    cover: "📓",
-    genre: "Thriller",
-  },
-];
+import { Eye } from "lucide-react";
 
 export default function FeaturedEbooksSection() {
+  const [ebooks, setEbooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/ebooks/featured")
+      .then((res) => res.json())
+      .then((data) => {
+        setEbooks(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Featured Error:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+        </div>
+      </section>
+    );
+  }
+
+  if (ebooks.length === 0) return null;
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4">
@@ -91,45 +57,43 @@ export default function FeaturedEbooksSection() {
           </p>
         </div>
 
-        {/* Ebooks Grid: 4 cards per row on desktop */}
+        {/* Ebooks Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {ebooks.slice(0, 4).map((ebook, i) => (
             <motion.div
-              key={ebook.id}
+              key={ebook._id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -8 }}
             >
-              <Link href={`/ebooks/${ebook.id}`}>
+              <Link href={`/ebooks/${ebook._id}`}>
                 <div className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
-                  {/* Cover */}
                   <div className="bg-gradient-to-br from-gray-50 to-indigo-50 p-8 flex items-center justify-center relative">
-                    <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
-                      {ebook.cover}
-                    </span>
+                    {ebook.coverImage ? (
+                      <img
+                        src={ebook.coverImage}
+                        alt={ebook.title}
+                        className="w-full h-40 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
+                        📖
+                      </span>
+                    )}
                     <div className="absolute inset-0 bg-indigo-600/0 group-hover:bg-indigo-600/10 transition-all duration-300 flex items-center justify-center">
                       <Eye className="w-10 h-10 text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div className="p-5 flex-grow">
                     <h3 className="font-semibold text-base text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
                       {ebook.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1">{ebook.writer}</p>
-
-                    <div className="flex items-center gap-1 mt-3">
-                      <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                      <span className="text-sm font-medium">
-                        {ebook.rating}
-                      </span>
-                      <span className="text-xs text-gray-400 ml-1">
-                        ({ebook.readers})
-                      </span>
-                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {ebook.writerName}
+                    </p>
 
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
                       <span className="badge badge-sm bg-indigo-50 text-indigo-600 border-indigo-200">

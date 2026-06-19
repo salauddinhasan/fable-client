@@ -1,109 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  Search,
-  Filter,
-  X,
-  Star,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-
-// ডামি ডাটা (পরে API থেকে আসবে)
-const allEbooks = [
-  {
-    id: 1,
-    title: "The Midnight Garden",
-    writer: "Sarah Johnson",
-    price: 9.99,
-    genre: "Fiction",
-    rating: 4.8,
-    cover: "📗",
-    sold: false,
-  },
-  {
-    id: 2,
-    title: "Stars Beyond",
-    writer: "Mike Chen",
-    price: 12.99,
-    genre: "Sci-Fi",
-    rating: 4.6,
-    cover: "📘",
-    sold: true,
-  },
-  {
-    id: 3,
-    title: "Love in Paris",
-    writer: "Emma Davis",
-    price: 7.99,
-    genre: "Romance",
-    rating: 4.9,
-    cover: "📙",
-    sold: false,
-  },
-  {
-    id: 4,
-    title: "The Dark Manor",
-    writer: "John Black",
-    price: 8.99,
-    genre: "Horror",
-    rating: 4.5,
-    cover: "📕",
-    sold: true,
-  },
-  {
-    id: 5,
-    title: "Dragon's Quest",
-    writer: "Lisa Wong",
-    price: 11.99,
-    genre: "Fantasy",
-    rating: 4.7,
-    cover: "📔",
-    sold: false,
-  },
-  {
-    id: 6,
-    title: "Code Zero",
-    writer: "Alex Kim",
-    price: 10.99,
-    genre: "Thriller",
-    rating: 4.4,
-    cover: "📓",
-    sold: false,
-  },
-  {
-    id: 7,
-    title: "Ocean's Secret",
-    writer: "Maria Silva",
-    price: 6.99,
-    genre: "Mystery",
-    rating: 4.3,
-    cover: "📒",
-    sold: false,
-  },
-  {
-    id: 8,
-    title: "Heart Strings",
-    writer: "Emma Davis",
-    price: 5.99,
-    genre: "Romance",
-    rating: 4.8,
-    cover: "📔",
-    sold: true,
-  },
-  {
-    id: 9,
-    title: "Neon Dreams",
-    writer: "Mike Chen",
-    price: 14.99,
-    genre: "Sci-Fi",
-    rating: 4.9,
-    cover: "📘",
-    sold: false,
-  },
-];
+import { Search, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 const genres = [
   "All",
@@ -117,6 +16,8 @@ const genres = [
 ];
 
 export default function BrowsePage() {
+  const [allEbooks, setAllEbooks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("All");
   const [sort, setSort] = useState("newest");
@@ -124,29 +25,47 @@ export default function BrowsePage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalEbooks, setTotalEbooks] = useState(0);
   const itemsPerPage = 6;
 
-  // Filter & Sort Logic
-  let filtered = allEbooks.filter((ebook) => {
-    const matchSearch =
-      ebook.title.toLowerCase().includes(search.toLowerCase()) ||
-      ebook.writer.toLowerCase().includes(search.toLowerCase());
-    const matchGenre = genre === "All" || ebook.genre === genre;
-    const matchMinPrice = !minPrice || ebook.price >= Number(minPrice);
-    const matchMaxPrice = !maxPrice || ebook.price <= Number(maxPrice);
-    return matchSearch && matchGenre && matchMinPrice && matchMaxPrice;
-  });
+  // API Fetch
+  useEffect(() => {
+    setLoading(true);
+    fetch(
+      `http://localhost:5000/api/ebooks?page=${currentPage}&limit=${itemsPerPage}&sort=${sort}&genre=${genre}&search=${search}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setAllEbooks(data.ebooks || []);
+        setTotalPages(data.pages || 1);
+        setTotalEbooks(data.total || 0);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch ebooks:", err);
+        setLoading(false);
+      });
+  }, [currentPage, sort, genre, search, minPrice, maxPrice]);
 
-  // Sort
-  if (sort === "price-low") filtered.sort((a, b) => a.price - b.price);
-  if (sort === "price-high") filtered.sort((a, b) => b.price - a.price);
-
-  // Pagination
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginatedEbooks = filtered.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+// useEffect(() => {
+//   setLoading(true);
+//   console.log("Fetching...");
+  
+//   fetch("http://localhost:5000/api/ebooks")
+//     .then((res) => res.json())
+//     .then((data) => {
+//       console.log("API Response:", data);
+//       setAllEbooks(data.ebooks || []);
+//       setTotalPages(data.pages || 1);
+//       setTotalEbooks(data.total || 0);
+//       setLoading(false);
+//     })
+//     .catch((err) => {
+//       console.error("API Error:", err);
+//       setLoading(false);
+//     });
+// }, []);  // ← empty dependency - শুধু একবার fetch
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -269,6 +188,7 @@ export default function BrowsePage() {
                     setMinPrice("");
                     setMaxPrice("");
                     setSort("newest");
+                    setSearch("");
                     setCurrentPage(1);
                   }}
                   className="btn btn-sm btn-ghost text-red-500"
@@ -282,21 +202,38 @@ export default function BrowsePage() {
 
         {/* Results Count */}
         <p className="text-sm text-gray-500 mb-4">
-          {filtered.length} ebook{filtered.length !== 1 ? "s" : ""} found
+          {totalEbooks} ebook{totalEbooks !== 1 ? "s" : ""} found
         </p>
 
-        {/* Ebooks Grid */}
-        {paginatedEbooks.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {paginatedEbooks.map((ebook, i) => (
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden animate-pulse"
+              >
+                <div className="bg-gray-200 p-10"></div>
+                <div className="p-3 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : allEbooks.length > 0 ? (
+          /* Ebooks Grid */
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {allEbooks.map((ebook, i) => (
               <motion.div
-                key={ebook.id}
+                key={ebook._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -4 }}
               >
-                <Link href={`/ebooks/${ebook.id}`}>
+                <Link href={`/ebooks/${ebook._id}`}>
                   <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all overflow-hidden relative">
                     {/* Sold Badge */}
                     {ebook.sold && (
@@ -307,7 +244,15 @@ export default function BrowsePage() {
 
                     {/* Cover */}
                     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 flex items-center justify-center">
-                      <span className="text-5xl">{ebook.cover}</span>
+                      {ebook.coverImage ? (
+                        <img
+                          src={ebook.coverImage}
+                          alt={ebook.title}
+                          className="w-full h-32 object-cover rounded"
+                        />
+                      ) : (
+                        <span className="text-5xl">📖</span>
+                      )}
                     </div>
 
                     {/* Info */}
@@ -316,7 +261,7 @@ export default function BrowsePage() {
                         {ebook.title}
                       </h3>
                       <p className="text-xs text-gray-500 mt-1">
-                        {ebook.writer}
+                        {ebook.writerName}
                       </p>
                       <div className="flex items-center justify-between mt-2">
                         <span className="badge badge-xs bg-indigo-50 text-indigo-600 border-indigo-200 text-[10px]">
