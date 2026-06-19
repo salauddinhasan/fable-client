@@ -76,7 +76,7 @@ const Navbar = () => {
 
               {isLoggedIn ? (
                 <div className="flex items-center gap-3">
-                  {/* ইউজার অ্যাভাটার + নাম */}
+                
                   <div className="flex items-center gap-2">
                     {session.user.image ? (
                       <img

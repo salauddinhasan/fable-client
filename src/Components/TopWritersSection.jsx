@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Star, BookOpen, TrendingUp } from "lucide-react"; // শুধু প্রয়োজনীয় ৩টি আইকন
+import { Star, BookOpen, TrendingUp } from "lucide-react";  
 
 const writers = [
   {
