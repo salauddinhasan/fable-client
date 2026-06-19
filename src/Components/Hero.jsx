@@ -8,7 +8,7 @@ import { ArrowRight, BookOpen, Sparkles, ChevronRight } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative w-full min-h-[65vh] bg-gradient-to-br from-[#F8F6F0] via-[#F0EDE6] to-[#E8E4DA] flex items-center overflow-hidden">
+    <section className="relative w-full min-h-[65vh] bg-gradient-to-br from-[#fdfdfca5] via-[#F0EDE6] to-[#E8E4DA] flex items-center overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-indigo-100/20 rounded-full blur-3xl"></div>
