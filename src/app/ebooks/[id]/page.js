@@ -43,10 +43,27 @@ export default function EbookDetailsPage() {
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
-    setTimeout(() => {
-      alert("Redirecting to Stripe Checkout...");
+    try {
+      const res = await fetch("/api/checkout_sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ebookId: ebook._id,
+          price: ebook.price,
+          title: ebook.title,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Payment failed. Please try again.");
+      }
+    } catch (err) {
+      alert("Something went wrong.");
+    } finally {
       setIsPurchasing(false);
-    }, 1000);
+    }
   };
 
   const handleBookmark = () => {
