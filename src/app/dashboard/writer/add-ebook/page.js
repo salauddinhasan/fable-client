@@ -19,15 +19,52 @@ export default function AddEbookPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!image) return "";
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("image", image);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      setUploading(false);
+      return data.url || "";
+    } catch (err) {
+      setUploading(false);
+      return "";
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // Upload image first
+    let coverImage = "";
+    if (image) {
+      coverImage = await uploadImage();
+    }
 
     try {
       const res = await fetch("http://localhost:5000/api/ebooks", {
@@ -38,6 +75,7 @@ export default function AddEbookPage() {
           description: form.description,
           price: Number(form.price),
           genre: form.genre,
+          coverImage: coverImage,
           writerName:
             session?.user?.name || session?.user?.email || "Unknown Writer",
           writerEmail: session?.user?.email || "",
@@ -84,7 +122,6 @@ export default function AddEbookPage() {
         className="bg-white rounded-xl border border-gray-100 shadow-sm p-6"
       >
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Title *
@@ -100,10 +137,9 @@ export default function AddEbookPage() {
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Description (Full Content) *
+              Description *
             </label>
             <textarea
               name="description"
@@ -116,7 +152,6 @@ export default function AddEbookPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Price */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Price ($) *
@@ -133,8 +168,6 @@ export default function AddEbookPage() {
                 required
               />
             </div>
-
-            {/* Genre */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Genre *
@@ -157,23 +190,49 @@ export default function AddEbookPage() {
             </div>
           </div>
 
-          {/* Cover Image */}
+          {/* Cover Image with Upload */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Cover Image
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-indigo-400 transition cursor-pointer">
-              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Click to upload (imgBB)</p>
-              <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+              id="coverImage"
+            />
+            <label
+              htmlFor="coverImage"
+              className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-indigo-400 transition cursor-pointer block"
+            >
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-40 object-cover rounded-lg"
+                />
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">
+                    Click to upload (imgBB)
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    PNG, JPG up to 5MB
+                  </p>
+                </>
+              )}
+            </label>
+            {uploading && (
+              <p className="text-xs text-indigo-600 mt-1">Uploading image...</p>
+            )}
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
-            disabled={loading}
-            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 disabled:opacity-50"
+            disabled={loading || uploading}
+            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 disabled:opacity-50 w-full justify-center"
           >
             {loading ? (
               <span className="loading loading-spinner loading-sm"></span>
