@@ -11,32 +11,20 @@ export default function UserDashboard() {
   const [purchasedEbooks, setPurchasedEbooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   if (session?.user?.email) {
-  //     fetch(`http://localhost:5000/api/ebooks`)
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         const sold = (data.ebooks || []).filter((e) => e.sold === true);
-  //         setPurchasedEbooks(sold);
-  //         setLoading(false);
-  //       })
-  //       .catch(() => setLoading(false));
-  //   }
-  // }, [session]);
-
   useEffect(() => {
-  if (session?.user?.email) {
-    fetch(`http://localhost:5000/api/dashboard/user/purchases?email=${session.user.email}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPurchasedEbooks(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }
-}, [session]);
-  
- 
+    if (session?.user?.email) {
+      fetch(
+        `http://localhost:5000/api/dashboard/user/purchases?email=${session.user.email}`,
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setPurchasedEbooks(Array.isArray(data) ? data : []);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }
+  }, [session]);
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">
