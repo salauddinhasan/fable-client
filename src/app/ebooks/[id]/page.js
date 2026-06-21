@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   ShoppingCart,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 export default function EbookDetailsPage() {
   const { id } = useParams();
@@ -41,6 +42,31 @@ export default function EbookDetailsPage() {
       });
   }, [id]);
 
+  // const handlePurchase = async () => {
+  //   setIsPurchasing(true);
+  //   try {
+  //     const res = await fetch("/api/checkout_sessions", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         ebookId: ebook._id,
+  //         price: ebook.price,
+  //         title: ebook.title,
+  //       }),
+  //     });
+  //     const data = await res.json();
+  //     if (data.url) {
+  //       window.location.href = data.url;
+  //     } else {
+  //       alert("Payment failed. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     alert("Something went wrong.");
+  //   } finally {
+  //     setIsPurchasing(false);
+  //   }
+  // };
+const { data: session } = authClient.useSession();
   const handlePurchase = async () => {
     setIsPurchasing(true);
     try {
@@ -51,6 +77,7 @@ export default function EbookDetailsPage() {
           ebookId: ebook._id,
           price: ebook.price,
           title: ebook.title,
+          userEmail: session?.user?.email || "", // ← এটা যোগ করুন
         }),
       });
       const data = await res.json();
@@ -65,7 +92,6 @@ export default function EbookDetailsPage() {
       setIsPurchasing(false);
     }
   };
-
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
   };
