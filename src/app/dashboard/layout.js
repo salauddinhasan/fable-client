@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
@@ -28,6 +28,12 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/login");
+    }
+  }, [isPending, session, router]);
+
   if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -36,10 +42,8 @@ export default function DashboardLayout({ children }) {
     );
   }
 
-  if (!session) {
-    router.push("/login");
-    return null;
-  }
+  // ✅ Not logged in - null return (redirect happening in useEffect)
+  if (!session) return null;
 
   const userRole = session.user?.role || "user";
 
@@ -223,7 +227,7 @@ export default function DashboardLayout({ children }) {
             <Menu className="w-6 h-6" />
           </button>
           <Link href="/" className="text-xl font-bold">
-              Fable
+            Fable
           </Link>
           <div className="w-6"></div>
         </div>
