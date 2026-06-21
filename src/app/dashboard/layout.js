@@ -20,6 +20,7 @@ import {
   LogOut,
   Home,
 } from "lucide-react";
+import DashboardTopBar from "@/Components/DashboardTopBar";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -222,11 +223,15 @@ export default function DashboardLayout({ children }) {
             <Menu className="w-6 h-6" />
           </button>
           <Link href="/" className="text-xl font-bold">
-            📚 Fable
+              Fable
           </Link>
           <div className="w-6"></div>
         </div>
 
+        {/* ✅ Dashboard Top Bar */}
+        <div className="hidden lg:block">
+          <DashboardTopBar />
+        </div>
         {/* Page Content */}
         <div className="p-4 md:p-6">{children}</div>
       </div>

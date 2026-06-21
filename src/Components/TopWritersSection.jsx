@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Star, BookOpen, TrendingUp } from "lucide-react";  
+import { Star, BookOpen, TrendingUp } from "lucide-react";
 
 const writers = [
   {
@@ -37,7 +37,7 @@ const writers = [
 
 export default function TopWritersSection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-26 bg-white">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
