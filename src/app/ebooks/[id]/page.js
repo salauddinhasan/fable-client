@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
-  Star,
   BookOpen,
   Bookmark,
   BookmarkCheck,
@@ -19,11 +18,14 @@ import { authClient } from "@/lib/auth-client";
 
 export default function EbookDetailsPage() {
   const { id } = useParams();
+  const { data: session } = authClient.useSession();
+
   const [ebook, setEbook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
 
+  // Fetch ebook data
   useEffect(() => {
     setLoading(true);
     fetch(`http://localhost:5000/api/ebooks/${id}`)
@@ -42,31 +44,19 @@ export default function EbookDetailsPage() {
       });
   }, [id]);
 
-  // const handlePurchase = async () => {
-  //   setIsPurchasing(true);
-  //   try {
-  //     const res = await fetch("/api/checkout_sessions", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         ebookId: ebook._id,
-  //         price: ebook.price,
-  //         title: ebook.title,
-  //       }),
-  //     });
-  //     const data = await res.json();
-  //     if (data.url) {
-  //       window.location.href = data.url;
-  //     } else {
-  //       alert("Payment failed. Please try again.");
-  //     }
-  //   } catch (err) {
-  //     alert("Something went wrong.");
-  //   } finally {
-  //     setIsPurchasing(false);
-  //   }
-  // };
-const { data: session } = authClient.useSession();
+  // Check if ebook is bookmarked by current user
+  useEffect(() => {
+    if (session?.user?.email && ebook?._id) {
+      fetch(`http://localhost:5000/api/bookmarks?email=${session.user.email}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const already = data.some((item) => item._id === ebook._id);
+          setIsBookmarked(already);
+        })
+        .catch(() => {});
+    }
+  }, [session, ebook]);
+
   const handlePurchase = async () => {
     setIsPurchasing(true);
     try {
@@ -77,7 +67,7 @@ const { data: session } = authClient.useSession();
           ebookId: ebook._id,
           price: ebook.price,
           title: ebook.title,
-          userEmail: session?.user?.email || "", // ← এটা যোগ করুন
+          userEmail: session?.user?.email || "",
         }),
       });
       const data = await res.json();
@@ -92,8 +82,33 @@ const { data: session } = authClient.useSession();
       setIsPurchasing(false);
     }
   };
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
+
+  const handleBookmark = async () => {
+    const email = session?.user?.email;
+    if (!email) {
+      alert("Please login first");
+      return;
+    }
+    try {
+      if (isBookmarked) {
+        await fetch(
+          `http://localhost:5000/api/bookmarks?email=${email}&ebookId=${ebook._id}`,
+          {
+            method: "DELETE",
+          },
+        );
+        setIsBookmarked(false);
+      } else {
+        await fetch("http://localhost:5000/api/bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, ebookId: ebook._id }),
+        });
+        setIsBookmarked(true);
+      }
+    } catch (err) {
+      console.error("Bookmark error:", err);
+    }
   };
 
   // Skeleton Loader
@@ -153,7 +168,6 @@ const { data: session } = authClient.useSession();
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Back Navigation */}
       <div className="max-w-4xl mx-auto px-4 pt-6">
         <Link
           href="/browse"
@@ -164,7 +178,6 @@ const { data: session } = authClient.useSession();
         </Link>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-6 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -173,7 +186,7 @@ const { data: session } = authClient.useSession();
         >
           <div className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row gap-8">
-              {/* Cover Image */}
+              {/* Cover */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -203,11 +216,7 @@ const { data: session } = authClient.useSession();
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <span
-                      className={`px-3 py-1 text-xs font-semibold rounded-full border ${
-                        ebook.sold
-                          ? "bg-red-50 text-red-700 border-red-200"
-                          : "bg-green-50 text-green-700 border-green-200"
-                      }`}
+                      className={`px-3 py-1 text-xs font-semibold rounded-full border ${ebook.sold ? "bg-red-50 text-red-700 border-red-200" : "bg-green-50 text-green-700 border-green-200"}`}
                     >
                       {ebook.sold ? "Sold" : "Available"}
                     </span>
@@ -220,13 +229,11 @@ const { data: session } = authClient.useSession();
                   </h1>
                 </div>
 
-                {/* Writer */}
                 <div className="inline-flex items-center gap-2 text-gray-600">
                   <User className="w-4 h-4" />
                   <span className="font-medium">{ebook.writerName}</span>
                 </div>
 
-                {/* Description */}
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-2">
                     Description
@@ -236,7 +243,6 @@ const { data: session } = authClient.useSession();
                   </p>
                 </div>
 
-                {/* Meta Info */}
                 <div className="flex flex-wrap gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
@@ -248,7 +254,6 @@ const { data: session } = authClient.useSession();
                   </div>
                 </div>
 
-                {/* Price & Actions */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-gray-100">
                   <div>
                     <p className="text-sm text-gray-500">Price</p>
@@ -266,13 +271,12 @@ const { data: session } = authClient.useSession();
                       >
                         {isPurchasing ? (
                           <>
-                            <span className="loading loading-spinner loading-sm"></span>
+                            <span className="loading loading-spinner loading-sm"></span>{" "}
                             Processing...
                           </>
                         ) : (
                           <>
-                            <ShoppingCart className="w-5 h-5" />
-                            Buy Now
+                            <ShoppingCart className="w-5 h-5" /> Buy Now
                           </>
                         )}
                       </button>
@@ -287,11 +291,7 @@ const { data: session } = authClient.useSession();
 
                     <button
                       onClick={handleBookmark}
-                      className={`p-3 rounded-xl border-2 transition-all ${
-                        isBookmarked
-                          ? "border-indigo-600 bg-indigo-50 text-indigo-600"
-                          : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300"
-                      }`}
+                      className={`p-3 rounded-xl border-2 transition-all ${isBookmarked ? "border-indigo-600 bg-indigo-50 text-indigo-600" : "border-gray-200 bg-white text-gray-400 hover:border-indigo-300"}`}
                     >
                       {isBookmarked ? (
                         <BookmarkCheck className="w-5 h-5" />
