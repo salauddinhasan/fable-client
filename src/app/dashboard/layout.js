@@ -28,11 +28,37 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // useEffect(() => {
+  //   if (!isPending && !session) {
+  //     router.push("/login");
+  //   }
+  // }, [isPending, session, router]);
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/login");
+      return; // ← এই return যোগ করুন
     }
-  }, [isPending, session, router]);
+
+    // 👇 এই অংশটা নতুন করে যোগ করুন
+    if (session?.user?.role && pathname) {
+      const role = session.user.role;
+
+      if (role === "user") {
+        if (
+          pathname.startsWith("/dashboard/admin") ||
+          pathname.startsWith("/dashboard/writer")
+        ) {
+          router.push("/dashboard/user");
+        }
+      }
+
+      if (role === "writer") {
+        if (pathname.startsWith("/dashboard/admin")) {
+          router.push("/dashboard/writer");
+        }
+      }
+    }
+  }, [isPending, session, router, pathname]);
 
   if (isPending) {
     return (
@@ -42,7 +68,6 @@ export default function DashboardLayout({ children }) {
     );
   }
 
-  // ✅ Not logged in - null return (redirect happening in useEffect)
   if (!session) return null;
 
   const userRole = session.user?.role || "user";
