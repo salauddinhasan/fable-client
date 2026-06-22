@@ -24,7 +24,7 @@ export default function WriterDashboard() {
   useEffect(() => {
     if (session?.user?.email) {
       fetch(
-        `http://localhost:5000/api/dashboard/writer/ebooks?writerEmail=${session.user.email}`,
+        `https://fable-server-vygh.onrender.com/api/dashboard/writer/ebooks?writerEmail=${session.user.email}`,
       )
         .then((res) => res.json())
         .then((data) => {
@@ -52,11 +52,14 @@ export default function WriterDashboard() {
 
   const handleUpdate = async () => {
     setSaving(true);
-    await fetch(`http://localhost:5000/api/ebooks/${editModal}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editForm),
-    });
+    await fetch(
+      `https://fable-server-vygh.onrender.com/api/ebooks/${editModal}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      },
+    );
     setEbooks(
       ebooks.map((e) => (e._id === editModal ? { ...e, ...editForm } : e)),
     );
@@ -66,7 +69,7 @@ export default function WriterDashboard() {
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this ebook?")) {
-      await fetch(`http://localhost:5000/api/ebooks/${id}`, {
+      await fetch(`https://fable-server-vygh.onrender.com/api/ebooks/${id}`, {
         method: "DELETE",
       });
       setEbooks(ebooks.filter((e) => e._id !== id));
@@ -163,9 +166,12 @@ export default function WriterDashboard() {
           );
         }}
         onDelete={async (id) => {
-          await fetch(`http://localhost:5000/api/ebooks/${id}`, {
-            method: "DELETE",
-          });
+          await fetch(
+            `https://fable-server-vygh.onrender.com/api/ebooks/${id}`,
+            {
+              method: "DELETE",
+            },
+          );
           setEbooks(ebooks.filter((e) => e._id !== id));
         }}
       />

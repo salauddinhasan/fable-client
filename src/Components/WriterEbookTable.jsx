@@ -32,11 +32,14 @@ export default function WriterEbookTable({ ebooks, onUpdate, onDelete }) {
 
   const handleUpdate = async () => {
     setSaving(true);
-    await fetch(`http://localhost:5000/api/ebooks/${editModal}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editForm),
-    });
+    await fetch(
+      `https://fable-server-vygh.onrender.com/api/ebooks/${editModal}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      },
+    );
     if (onUpdate) onUpdate({ ...editForm, _id: editModal });
     setEditModal(null);
     setSaving(false);

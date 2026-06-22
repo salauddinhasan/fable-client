@@ -10,22 +10,22 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-const fetchUsers = () => {
-  fetch("http://localhost:5000/api/dashboard/users")  // ← এটা change
-    .then((res) => res.json())
-    .then((data) => {
-      setUsers(Array.isArray(data) ? data : []);
-      setLoading(false);
-    })
-    .catch(() => setLoading(false));
-};
+  const fetchUsers = () => {
+    fetch("https://fable-server-vygh.onrender.com/api/dashboard/users")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const handleRoleChange = async (email, newRole) => {
-    await fetch("http://localhost:5000/api/admin/users/role", {
+    await fetch("https://fable-server-vygh.onrender.com/api/admin/users/role", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, role: newRole }),
@@ -35,9 +35,12 @@ const fetchUsers = () => {
 
   const handleDelete = async (email) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      await fetch(`http://localhost:5000/api/admin/users?email=${email}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `https://fable-server-vygh.onrender.com/api/admin/users?email=${email}`,
+        {
+          method: "DELETE",
+        },
+      );
       setUsers(users.filter((u) => u.email !== email));
     }
   };

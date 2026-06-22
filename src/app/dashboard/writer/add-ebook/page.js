@@ -42,10 +42,13 @@ export default function AddEbookPage() {
     formData.append("image", image);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://fable-server-vygh.onrender.com//api/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
       const data = await res.json();
       setUploading(false);
       return data.url || "";
@@ -67,21 +70,24 @@ export default function AddEbookPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/ebooks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title,
-          description: form.description,
-          price: Number(form.price),
-          genre: form.genre,
-          coverImage: coverImage,
-          writerName:
-            session?.user?.name || session?.user?.email || "Unknown Writer",
-          writerEmail: session?.user?.email || "",
-          writer: session?.user?.id || null,
-        }),
-      });
+      const res = await fetch(
+        "https://fable-server-vygh.onrender.com/api/ebooks",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: form.title,
+            description: form.description,
+            price: Number(form.price),
+            genre: form.genre,
+            coverImage: coverImage,
+            writerName:
+              session?.user?.name || session?.user?.email || "Unknown Writer",
+            writerEmail: session?.user?.email || "",
+            writer: session?.user?.id || null,
+          }),
+        },
+      );
 
       const data = await res.json();
 

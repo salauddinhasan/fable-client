@@ -10,7 +10,7 @@ export default function AdminEbooksPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchEbooks = () => {
-    fetch("http://localhost:5000/api/admin/ebooks")
+    fetch("https://fable-server-vygh.onrender.com/api/admin/ebooks")
       .then((res) => res.json())
       .then((data) => {
         setEbooks(Array.isArray(data) ? data : []);
@@ -24,17 +24,23 @@ export default function AdminEbooksPage() {
   }, []);
 
   const toggleStatus = async (id) => {
-    await fetch(`http://localhost:5000/api/admin/ebooks/${id}/toggle-status`, {
-      method: "PUT",
-    });
+    await fetch(
+      `https://fable-server-vygh.onrender.com/api/admin/ebooks/${id}/toggle-status`,
+      {
+        method: "PUT",
+      },
+    );
     fetchEbooks();
   };
 
   const handleDelete = async (id) => {
     if (confirm("Delete this ebook?")) {
-      await fetch(`http://localhost:5000/api/admin/ebooks/${id}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `https://fable-server-vygh.onrender.com/api/admin/ebooks/${id}`,
+        {
+          method: "DELETE",
+        },
+      );
       fetchEbooks();
     }
   };

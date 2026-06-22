@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, TrendingUp, ShoppingCart, FileText } from "lucide-react";
-import TransactionsTable from "@/components/TransactionsTable"; // ✅ এখানে ইম্পোর্ট
+import TransactionsTable from "@/components/TransactionsTable"; 
 
 export default function AdminTransactionsPage() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/dashboard/transactions")
+    fetch("https://fable-server-vygh.onrender.com/api/dashboard/transactions")
       .then((res) => res.json())
       .then((data) => {
         setTransactions(Array.isArray(data) ? data : []);

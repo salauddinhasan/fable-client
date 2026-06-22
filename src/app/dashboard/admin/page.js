@@ -15,9 +15,11 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const [statsRes, txnRes, usersRes] = await Promise.all([
-          fetch("http://localhost:5000/api/dashboard/stats"),
-          fetch("http://localhost:5000/api/dashboard/transactions"),
-          fetch("http://localhost:5000/api/dashboard/users"),
+          fetch("https://fable-server-vygh.onrender.com/api/dashboard/stats"),
+          fetch(
+            "https://fable-server-vygh.onrender.com/api/dashboard/transactions",
+          ),
+          fetch("https://fable-server-vygh.onrender.com/api/dashboard/users"),
         ]);
         const statsData = await statsRes.json();
         const txnData = await txnRes.json();
