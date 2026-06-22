@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+ # 📚 Fable - Ebook Sharing Platform
 
-## Getting Started
+A full-stack MERN application for sharing, discovering, and purchasing original ebooks.
 
-First, run the development server:
+## 🌐 Live Site
+ 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🔐 Authentication
+- Email/Password Registration & Login
+- Google OAuth Login
+- JWT-based authentication
+- Role-based access (User, Writer, Admin)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 👤 User Dashboard
+- Purchase History with status
+- My Ebooks gallery view
+- Bookmarks management
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### ✍️ Writer Dashboard
+- Add/Edit/Delete ebooks
+- imgBB image upload for covers
+- Sales history tracking
+- Publish/Unpublish ebooks
 
-## Learn More
+### 🛡️ Admin Dashboard
+- Manage users (role change, delete)
+- Manage all ebooks (publish/unpublish, delete)
+- View all transactions
+- Analytics: Monthly sales chart, Genre pie chart
 
-To learn more about Next.js, take a look at the following resources:
+### 📚 Public Features
+- Browse ebooks with search, filter, sort, pagination
+- Ebook details with purchase via Stripe
+- Bookmark ebooks for later
+- Home page with featured ebooks, top writers, genres
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 💳 Payment
+- Stripe Checkout integration
+- Purchase history tracking
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🎨 UI/UX
+- Responsive design (mobile, tablet, desktop)
+- Framer Motion animations
+- DaisyUI + Tailwind CSS
+- Skeleton loading states
+- Custom 404 page
 
-## Deploy on Vercel
+## 🛠️ Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Category | Technology |
+|----------|------------|
+| Frontend | Next.js (App Router), React |
+| Styling | Tailwind CSS, DaisyUI |
+| Animation | Framer Motion |
+| Icons | Lucide React |
+| Auth | BetterAuth |
+| Backend | Express.js, Node.js |
+| Database | MongoDB (Mongoose) |
+| Storage | imgBB |
+| Payment | Stripe |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📦 NPM Packages
+
+### Client
+- next
+- react, react-dom
+- tailwindcss, daisyui
+- framer-motion
+- lucide-react
+- better-auth
+- stripe
+
+### Server
+- express
+- cors
+- dotenv
+- mongoose
+- stripe
+- multer
+- nodemon
+
+## ⚙️ Environment Variables
+
+### Client (.env.local)
