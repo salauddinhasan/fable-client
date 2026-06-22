@@ -9,31 +9,28 @@ export default function PaymentSuccess() {
   const sessionId = searchParams.get("session_id");
   const [status, setStatus] = useState("processing");
 
- 
-console.log("Session ID from URL:", sessionId); // debug
+  console.log("Session ID from URL:", sessionId);
 
-useEffect(() => {
-  if (sessionId) {
-    fetch("http://localhost:5000/api/complete-purchase", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("Complete purchase response:", data); // debug
-        if (data.success) {
-          setStatus("completed");
-        } else {
-          setStatus("error");
-        }
+  useEffect(() => {
+    if (sessionId) {
+      fetch("http://localhost:5000/api/complete-purchase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
       })
-      .catch(err => {
-        console.error("Fetch error:", err);
-        setStatus("error");
-      });
-  }
-}, [sessionId]);
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setStatus("completed");
+          } else {
+            setStatus("error");
+          }
+        })
+        .catch((err) => {
+          setStatus("error");
+        });
+    }
+  }, [sessionId]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-50">

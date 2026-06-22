@@ -43,8 +43,8 @@ export default function NotFound() {
           transition={{ delay: 0.4 }}
           className="text-gray-500 mb-8 leading-relaxed"
         >
-          Oops! The page you&;re looking for seems to have wandered off. It might
-          have been removed, renamed, or never existed.
+          Oops! The page you&;re looking for seems to have wandered off. It
+          might have been removed, renamed, or never existed.
         </motion.p>
 
         {/* Action Buttons */}
@@ -76,9 +76,7 @@ export default function NotFound() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
           className="mt-10 flex justify-center gap-2 text-gray-300"
-        >
-         
-        </motion.div>
+        ></motion.div>
       </div>
     </div>
   );

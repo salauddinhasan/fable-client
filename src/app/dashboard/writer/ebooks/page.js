@@ -33,7 +33,7 @@ export default function WriterEbooksPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">📚 My Ebooks</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6"> My Ebooks</h1>
 
       <WriterEbookTable
         ebooks={ebooks}

@@ -28,18 +28,12 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // useEffect(() => {
-  //   if (!isPending && !session) {
-  //     router.push("/login");
-  //   }
-  // }, [isPending, session, router]);
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/login");
-      return; // ← এই return যোগ করুন
+      return;
     }
 
-    // 👇 এই অংশটা নতুন করে যোগ করুন
     if (session?.user?.role && pathname) {
       const role = session.user.role;
 
@@ -170,9 +164,16 @@ export default function DashboardLayout({ children }) {
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">📚</span>
-            <span className="font-bold text-lg">Fable</span>
+          <Link href="/" className="flex items-center ">
+            <img
+              src="/logo.png"
+              alt="Fable"
+              className="h-10 w-auto"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+            <span className="text-2xl font-bold text-indigo-600">Fable</span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -257,7 +258,7 @@ export default function DashboardLayout({ children }) {
           <div className="w-6"></div>
         </div>
 
-        {/* ✅ Dashboard Top Bar */}
+        {/*  Dashboard Top Bar */}
         <div className="hidden lg:block">
           <DashboardTopBar />
         </div>

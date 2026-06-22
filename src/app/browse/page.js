@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Search, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { FiPenTool } from "react-icons/fi";
+import { CgCalendarDates } from "react-icons/cg";
 
 const genres = [
   "All",
@@ -43,29 +45,9 @@ export default function BrowsePage() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch ebooks:", err);
         setLoading(false);
       });
   }, [currentPage, sort, genre, search, minPrice, maxPrice]);
-
-// useEffect(() => {
-//   setLoading(true);
-//   console.log("Fetching...");
-  
-//   fetch("http://localhost:5000/api/ebooks")
-//     .then((res) => res.json())
-//     .then((data) => {
-//       console.log("API Response:", data);
-//       setAllEbooks(data.ebooks || []);
-//       setTotalPages(data.pages || 1);
-//       setTotalEbooks(data.total || 0);
-//       setLoading(false);
-//     })
-//     .catch((err) => {
-//       console.error("API Error:", err);
-//       setLoading(false);
-//     });
-// }, []);  // ← empty dependency - শুধু একবার fetch
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -234,42 +216,79 @@ export default function BrowsePage() {
                 whileHover={{ y: -4 }}
               >
                 <Link href={`/ebooks/${ebook._id}`}>
-                  <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all overflow-hidden relative">
+                  <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
                     {/* Sold Badge */}
                     {ebook.sold && (
-                      <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold z-10">
-                        Sold
+                      <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-rose-500 text-white text-[10px] px-3 py-1 rounded-full font-semibold z-10 shadow-lg">
+                        Sold Out
                       </div>
                     )}
 
                     {/* Cover */}
-                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 flex items-center justify-center">
+                    <div className="relative overflow-hidden h-48 bg-gradient-to-br from-indigo-50 to-purple-50">
                       {ebook.coverImage ? (
                         <img
                           src={ebook.coverImage}
                           alt={ebook.title}
-                          className="w-full h-32 object-cover rounded"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                       ) : (
-                        <span className="text-5xl">📖</span>
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-7xl group-hover:scale-125 group-hover:rotate-12 transition-all duration-500">
+                            📖
+                          </span>
+                        </div>
                       )}
+
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                      {/* Hover Content */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-end pb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                        <span className="text-white font-bold text-sm bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
+                          View Details →
+                        </span>
+                      </div>
                     </div>
 
                     {/* Info */}
-                    <div className="p-3">
-                      <h3 className="font-semibold text-sm text-gray-900 truncate">
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-600 truncate group-hover:text-indigo-600 transition-colors text-[15px]">
                         {ebook.title}
                       </h3>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {ebook.writerName}
+
+                      {/* Short Description */}
+                      <p className="text-xs text-gray-400 mt-1.5 line-clamp-2">
+                        {ebook.description?.slice(0, 80)}...
                       </p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="badge badge-xs bg-indigo-50 text-indigo-600 border-indigo-200 text-[10px]">
+
+                      {/* Writer + Date */}
+                      <div className="flex items-center justify-between mt-2 text-sm font-semibold text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <FiPenTool size={14} /> {ebook.writerName}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <CgCalendarDates />{" "}
+                          {new Date(ebook.createdAt).toLocaleDateString(
+                            "en-US",
+                            { month: "short", day: "numeric", year: "numeric" },
+                          )}
+                        </span>
+                      </div>
+
+                      {/* Genre + Price */}
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                        <span className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[11px] font-semibold tracking-wide">
                           {ebook.genre}
                         </span>
-                        <span className="font-bold text-indigo-600 text-sm">
-                          ${ebook.price}
-                        </span>
+                        <div className="text-right">
+                          <p className="text-[10px] text-gray-400 uppercase">
+                            Price
+                          </p>
+                          <p className="font-bold text-indigo-600 text-lg leading-tight">
+                            ${ebook.price}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>

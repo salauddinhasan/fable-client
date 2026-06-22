@@ -24,12 +24,11 @@ export function middleware(request) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // ✅ Role check
+  //  Role check
   const userRole = request.cookies.get("better-auth.session_token")?.value;
 
   // Admin routes
   if (pathname.startsWith("/dashboard/admin")) {
-    
   }
 
   // Writer routes

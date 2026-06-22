@@ -46,13 +46,12 @@ export default function RegisterPage() {
     }
   };
 
-const handleGoogleSignUp = async () => {
+  const handleGoogleSignUp = async () => {
     setLoading(true);
     await signIn.social({
       provider: "google",
-      callbackURL: "/", 
+      callbackURL: "/",
     });
- 
   };
 
   return (
@@ -136,9 +135,9 @@ const handleGoogleSignUp = async () => {
           <div className="divider text-xs text-gray-400">OR</div>
 
           <button
-            type="button"  
+            type="button"
             className="btn btn-outline w-full"
-            onClick={handleGoogleSignUp} 
+            onClick={handleGoogleSignUp}
           >
             Continue with Google
           </button>

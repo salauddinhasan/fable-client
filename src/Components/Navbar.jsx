@@ -43,11 +43,17 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
-          <Link
-            href="/"
-            className="text-2xl font-bold text-indigo-600 hover:text-indigo-700"
-          >
-            Fable
+
+          <Link href="/" className="flex items-center ">
+            <img
+              src="/logo.png"
+              alt="Fable"
+              className="h-10 w-auto"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+            <span className="text-2xl font-bold text-indigo-600">Fable</span>
           </Link>
 
           {/* Desktop Menu */}

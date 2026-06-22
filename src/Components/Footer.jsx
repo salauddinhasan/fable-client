@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function Footer() {
   const handleSubscribe = (e) => {
     e.preventDefault();
-    // ফ্রন্টএন্ড-অনলি নিউজলেটার অ্যাকশন
+
     alert("Thank you for subscribing to Fable Newsletter!");
     e.target.reset();
   };
@@ -13,7 +13,6 @@ export default function Footer() {
     <footer className="bg-gray-900 text-gray-300 border-t border-gray-800 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* ১. ব্র্যান্ড এবং ডেসক্রিপশন */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-black text-base shadow-sm">
@@ -29,7 +28,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* ২. কুইক লিংকস (Quick Links) */}
           <div>
             <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Quick Links
@@ -70,7 +68,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* ৩. সোশ্যাল মিডিয়া (Dummy Links) */}
           <div>
             <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Follow Us
@@ -118,7 +115,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* ৪. নিউজলেটার সাইনআপ বক্স (Frontend only) */}
           <div>
             <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Newsletter
@@ -146,10 +142,9 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ৫. বটম সেকশন: কপিরাইট */}
         <div className="border-t border-gray-800 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
           <p>
-            © {new Date().getFullYear()} Fable Platform. All rights reserved.
+            &copy; {new Date().getFullYear()} Fable Platform. All rights reserved.
           </p>
           <p>Designed for Recruiters with ❤️</p>
         </div>

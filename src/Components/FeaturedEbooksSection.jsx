@@ -16,7 +16,6 @@ export default function FeaturedEbooksSection() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Featured Error:", err);
         setLoading(false);
       });
   }, []);
