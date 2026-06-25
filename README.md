@@ -3,7 +3,8 @@
 A full-stack MERN application for sharing, discovering, and purchasing original ebooks.
 
 ## 🌐 Live Site
- 
+live(client): https://fable-client-three.vercel.app 
+live(server): https://fable-server-vygh.onrender.com
 
 ## 🚀 Features
 
