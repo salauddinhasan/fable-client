@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client.js";
+import Logo from "@/image/logo.png";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,8 +47,10 @@ const Navbar = () => {
           {/* Logo */}
 
           <Link href="/" className="flex items-center ">
-            <img
-              src="/logo.png"
+            <Image
+              src={Logo}
+              width={40}
+              height={40}
               alt="Fable"
               className="h-10 w-auto"
               onError={(e) => {

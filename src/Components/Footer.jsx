@@ -35,7 +35,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/about"
+                  href="#"
                   className="hover:text-indigo-400 transition-colors"
                 >
                   About Us
@@ -43,7 +43,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href="#"
                   className="hover:text-indigo-400 transition-colors"
                 >
                   Contact
@@ -51,7 +51,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/privacy"
+                  href="#"
                   className="hover:text-indigo-400 transition-colors"
                 >
                   Privacy Policy
@@ -59,7 +59,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/terms"
+                  href="#"
                   className="hover:text-indigo-400 transition-colors"
                 >
                   Terms of Service

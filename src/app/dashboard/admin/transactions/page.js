@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, TrendingUp, ShoppingCart, FileText } from "lucide-react";
-import TransactionsTable from "@/components/TransactionsTable"; 
+import TransactionsTable from "@/Components/TransactionsTable";
 
 export default function AdminTransactionsPage() {
   const [transactions, setTransactions] = useState([]);
@@ -96,7 +96,6 @@ export default function AdminTransactionsPage() {
           <h2 className="font-semibold text-gray-900">Transaction List</h2>
         </div>
         <TransactionsTable transactions={transactions} />{" "}
-        {/* ✅ এখানে ব্যবহার */}
       </div>
     </div>
   );

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 
-export function middleware(request) {
+export default function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // Public routes
   if (
     pathname === "/" ||
     pathname === "/login" ||
@@ -15,25 +14,16 @@ export function middleware(request) {
     return NextResponse.next();
   }
 
-  // Check session
-  const sessionCookie = request.cookies.get("better-auth.session_token");
+  // Check all cookies for session
+  const allCookies = request.cookies.getAll();
+  const hasSession = allCookies.some(
+    (c) => c.name.includes("better-auth") || c.name.includes("session"),
+  );
 
-  if (!sessionCookie) {
+  if (!hasSession) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
-  }
-
-  //  Role check
-  const userRole = request.cookies.get("better-auth.session_token")?.value;
-
-  // Admin routes
-  if (pathname.startsWith("/dashboard/admin")) {
-  }
-
-  // Writer routes
-  if (pathname.startsWith("/dashboard/writer")) {
-    // Writer role check
   }
 
   return NextResponse.next();

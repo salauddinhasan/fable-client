@@ -18,6 +18,10 @@ export const auth = betterAuth({
       clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
     },
   },
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://fable-client-three.vercel.app",
+  ],
 
   user: {
     additionalFields: {

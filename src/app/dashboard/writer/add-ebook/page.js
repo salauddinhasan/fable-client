@@ -43,7 +43,7 @@ export default function AddEbookPage() {
 
     try {
       const res = await fetch(
-        "https://fable-server-vygh.onrender.com//api/upload",
+        "https://fable-server-vygh.onrender.com/api/upload",
         {
           method: "POST",
           body: formData,

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
+
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -19,8 +20,11 @@ import {
   X,
   LogOut,
   Home,
+  Image,
 } from "lucide-react";
 import DashboardTopBar from "@/Components/DashboardTopBar";
+
+import Logo from "@/image/logo.png";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -165,8 +169,10 @@ export default function DashboardLayout({ children }) {
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <Link href="/" className="flex items-center ">
-            <img
-              src="/logo.png"
+            <Image
+              src={Logo}
+              width={40}
+              height={40}
               alt="Fable"
               className="h-10 w-auto"
               onError={(e) => {

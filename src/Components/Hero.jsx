@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Sparkles, ChevronRight } from "lucide-react";
+import HeroImage from '@/image/hero_Image.png';
 
 const Hero = () => {
   return (
@@ -59,7 +60,7 @@ const Hero = () => {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="/about"
+                href="#"
                 className="group inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white/80 backdrop-blur-sm hover:bg-white text-[#13131F] font-semibold rounded-lg transition-all duration-300 border border-gray-200/50 hover:border-indigo-200 hover:shadow-lg hover:scale-105 text-sm"
               >
                 <span>Learn More</span>
@@ -114,7 +115,7 @@ const Hero = () => {
               {/* Image Container - Full size */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-indigo-500/5">
                 <Image
-                  src="/hero_Image.png"
+                  src={HeroImage}
                   alt="Fable Ebook Platform"
                   width={800}
                   height={600}
